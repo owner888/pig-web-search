@@ -1,0 +1,23 @@
+{
+    "name": "owner888/pig-web-search",
+    "description": "Web search for the pig coding agent: search the web and read pages in pure PHP with no API key — DuckDuckGo results, a page's readable text, and the live DOM from a headless Chrome for pages built by JavaScript.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["pig", "pig-package", "web-search", "duckduckgo", "headless-chrome", "coding-agent"],
+    "authors": [
+        {"name": "the developer"}
+    ],
+    "require": {
+        "php": ">=8.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "PigWebSearch\\": "src/"
+        }
+    },
+    "extra": {
+        "pig": {
+            "extensions": ["./extensions/pig-web-search.php"]
+        }
+    }
+}
