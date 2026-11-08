@@ -9,7 +9,7 @@ use Pig\Ai\TextContent;
 use Pig\Async\AbortSignal;
 use Pig\CodingAgent\CustomTools\CustomTool;
 use Pig\CodingAgent\Extensions\ExtensionApi;
-use Pig\CodingAgent\Hooks\HookContext;
+use Pig\CodingAgent\Extensions\ExtensionContext;
 use PigWebSearch\HeadlessBrowser;
 
 /*
@@ -34,7 +34,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-return function (ExtensionApi $pi): void {
+return function (ExtensionApi $pig): void {
     $cleanDuckDuckGoUrl = static function (string $url): string {
         if (str_starts_with($url, '//')) {
             $url = 'https:' . $url;
@@ -130,7 +130,7 @@ return function (ExtensionApi $pi): void {
     };
 
     // 1. Tool: web_search
-    $pi->registerTool(new CustomTool(
+    $pig->registerTool(new CustomTool(
         name: 'web_search',
         label: 'Web Search',
         description: 'Search the web for real-time information, documentation, news, or technical references using DuckDuckGo. '
@@ -149,7 +149,7 @@ return function (ExtensionApi $pi): void {
             ],
             'required' => ['query'],
         ],
-        execute: static function (string $id, array $params, ?Closure $onUpdate, HookContext $ctx, ?AbortSignal $signal) use ($parseDuckDuckGoHtml): AgentToolResult {
+        execute: static function (string $id, array $params, ?Closure $onUpdate, ExtensionContext $ctx, ?AbortSignal $signal) use ($parseDuckDuckGoHtml): AgentToolResult {
             $signal?->throwIfAborted();
 
             $query = trim((string) ($params['query'] ?? ''));
@@ -212,7 +212,7 @@ return function (ExtensionApi $pi): void {
     ));
 
     // 2. Tool: fetch_web_page
-    $pi->registerTool(new CustomTool(
+    $pig->registerTool(new CustomTool(
         name: 'fetch_web_page',
         label: 'Fetch Web Page',
         description: 'Fetch the readable text content of a web page by URL, stripped of scripts, navigation, and styles. '
@@ -232,7 +232,7 @@ return function (ExtensionApi $pi): void {
             ],
             'required' => ['url'],
         ],
-        execute: static function (string $id, array $params, ?Closure $onUpdate, HookContext $ctx, ?AbortSignal $signal) use ($extractCleanText): AgentToolResult {
+        execute: static function (string $id, array $params, ?Closure $onUpdate, ExtensionContext $ctx, ?AbortSignal $signal) use ($extractCleanText): AgentToolResult {
             $signal?->throwIfAborted();
 
             $url = trim((string) ($params['url'] ?? ''));
@@ -285,7 +285,7 @@ return function (ExtensionApi $pi): void {
     ));
 
     // 3. Tool: browse_web_page — the same page, rendered by the Chrome on this machine
-    $pi->registerTool(new CustomTool(
+    $pig->registerTool(new CustomTool(
         name: 'browse_web_page',
         label: 'Browse Web Page',
         description: 'Render a web page in a headless Chrome and return the text of the live DOM after its JavaScript has run. '
@@ -309,7 +309,7 @@ return function (ExtensionApi $pi): void {
             ],
             'required' => ['url'],
         ],
-        execute: static function (string $id, array $params, ?Closure $onUpdate, HookContext $ctx, ?AbortSignal $signal): AgentToolResult {
+        execute: static function (string $id, array $params, ?Closure $onUpdate, ExtensionContext $ctx, ?AbortSignal $signal): AgentToolResult {
             $signal?->throwIfAborted();
 
             $url = trim((string) ($params['url'] ?? ''));
@@ -351,9 +351,9 @@ return function (ExtensionApi $pi): void {
     ));
 
     // 4. Command: /search <query>
-    $pi->registerCommand(
+    $pig->registerCommand(
         'search',
-        static function (string $query, HookContext $ctx) use ($pi): void {
+        static function (string $query, ExtensionContext $ctx) use ($pig): void {
             $query = trim($query);
             if ($query === '') {
                 if ($ctx->hasUi) {
@@ -368,7 +368,7 @@ return function (ExtensionApi $pi): void {
                 $ctx->ui->notify("Searching web for \"{$query}\"…", 'info');
             }
 
-            $tool = $pi->tool('web_search');
+            $tool = $pig->tool('web_search');
             if ($tool === null) {
                 return;
             }
