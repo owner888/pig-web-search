@@ -7,7 +7,7 @@ use Pig\Ai\Http\HttpClient;
 use Pig\Ai\Http\Request;
 use Pig\Ai\TextContent;
 use Pig\Async\AbortSignal;
-use Pig\CodingAgent\CustomTools\CustomTool;
+use Pig\CodingAgent\Extensions\ToolDefinition;
 use Pig\CodingAgent\Extensions\ExtensionApi;
 use Pig\CodingAgent\Extensions\ExtensionContext;
 use PigWebSearch\HeadlessBrowser;
@@ -130,7 +130,7 @@ return function (ExtensionApi $pig): void {
     };
 
     // 1. Tool: web_search
-    $pig->registerTool(new CustomTool(
+    $pig->registerTool(new ToolDefinition(
         name: 'web_search',
         label: 'Web Search',
         description: 'Search the web for real-time information, documentation, news, or technical references using DuckDuckGo. '
@@ -212,7 +212,7 @@ return function (ExtensionApi $pig): void {
     ));
 
     // 2. Tool: fetch_web_page
-    $pig->registerTool(new CustomTool(
+    $pig->registerTool(new ToolDefinition(
         name: 'fetch_web_page',
         label: 'Fetch Web Page',
         description: 'Fetch the readable text content of a web page by URL, stripped of scripts, navigation, and styles. '
@@ -285,7 +285,7 @@ return function (ExtensionApi $pig): void {
     ));
 
     // 3. Tool: browse_web_page — the same page, rendered by the Chrome on this machine
-    $pig->registerTool(new CustomTool(
+    $pig->registerTool(new ToolDefinition(
         name: 'browse_web_page',
         label: 'Browse Web Page',
         description: 'Render a web page in a headless Chrome and return the text of the live DOM after its JavaScript has run. '
